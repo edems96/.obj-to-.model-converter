@@ -2,8 +2,10 @@
 
 int main(int argc, char** args) {
 	
-	if( doInput("nap.obj") )
+	if( doInput("nap.obj") ) {
 		printf("do Input ok\n");
+		printInfo();
+	}
 	else
 		printf("do Input not ok\n");
 	
@@ -20,13 +22,23 @@ bool doInput(const char* path) {
 		return false;
 	}
 	
-	while( true ) {
-		char buffer[256];
+	while( !feof(f) ) {
+		string buff;
+		int r;
 		
-		int r = fscanf(f, "%s\n", buffer);
-		printf("buffer: %s\n", buffer);
-		if( r == EOF )
-			break;
+		while( true ) {
+			r = fgetc(f);
+			
+			if( r == EOF || r == '\n' ) {
+				break;
+			}
+			
+			buff.push_back(r);
+		}
+		
+		const char* buffer = buff.c_str();
+		
+		//printf("buffer (%d): %s\n", buff.length(), buffer);
 		
 		if( buffer[0] == '#' )
 			continue;
@@ -43,8 +55,6 @@ bool doInput(const char* path) {
 				vertexes.push_back(v);
 			else
 				printf("Failed to read vertex property!\n");
-			
-			printf("r: %d\n", r);
 		}
 		else if( buffer[0] == 'v' && buffer[1] == 't' ) {
 			TextureCoordinate tc;
@@ -133,7 +143,6 @@ bool doInput(const char* path) {
 				printf("Failed to read face properly!\n");
 		}
 		
-		break;
 	}
 	
 	fclose(f);
@@ -143,4 +152,14 @@ bool doInput(const char* path) {
 
 bool doOutput(const char* path) {
 	return true;
+}
+
+void printInfo() {
+	printf("#INFO#\n");
+	printf("\tVertex count: %d\n", vertexes.size());
+	printf("\tTextureCoordinate count: %d\n", textureCoordinates.size());
+	printf("\tNormal count: %d\n", normals.size());
+	printf("\tFace count: %d\n", faces.size());
+	
+	printf("%d %d %d", normals.get(0).x, normals.get(1).y, normals.get(2).z);
 }

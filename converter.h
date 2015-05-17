@@ -2,7 +2,9 @@
 #define CONVERTER_H
 
 #include <cstdio>
+#include <cstdlib>
 #include <vector>
+#include <string>
 
 using namespace std;
 
@@ -35,5 +37,7 @@ int main(int argc, char** args);
 
 bool doInput(const char* path);
 bool doOutput(const char* path);
+
+void printInfo();
 
 #endif
