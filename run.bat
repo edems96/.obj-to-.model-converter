@@ -1,2 +1,2 @@
-compile.exe
+converter.exe
 pause
