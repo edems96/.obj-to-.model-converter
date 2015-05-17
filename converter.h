@@ -2,6 +2,7 @@
 #define CONVERTER_H
 
 #include <cstdio>
+#include <vector>
 
 using namespace std;
 
@@ -13,11 +14,11 @@ struct Vertex {
 
 struct TextureCoordinate {
 	float u, v; // w
-}
+};
 
 struct Normal {
 	float x, y, z;
-}
+};
 
 struct Face {
 	uint vertex[3];

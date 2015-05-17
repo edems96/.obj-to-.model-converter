@@ -1,0 +1,2 @@
+compile.exe
+pause
