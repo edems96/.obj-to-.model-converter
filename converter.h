@@ -28,6 +28,8 @@ struct Face {
 	uint normal[3];
 };
 
+char *mtlLib;
+
 vector<Vertex> vertexes;
 vector<TextureCoordinate> textureCoordinates;
 vector<Normal> normals;

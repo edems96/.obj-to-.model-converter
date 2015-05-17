@@ -71,14 +71,14 @@ bool doInput(const char* path) {
 		}
 		else if( buffer[0] == 'v' && buffer[1] == 'n' ) {
 			Normal n;
-			
+
 			r = sscanf(buffer,
 				"vn %f %f %f",
 				&n.x,
 				&n.y,
 				&n.z);
 				
-			if( r > 0 )
+			if( r == 3 )
 				normals.push_back(n);
 			else
 				printf("Failed to read normal property!\n");
@@ -161,5 +161,5 @@ void printInfo() {
 	printf("\tNormal count: %d\n", normals.size());
 	printf("\tFace count: %d\n", faces.size());
 	
-	printf("%d %d %d", normals.get(0).x, normals.get(1).y, normals.get(2).z);
+	//printf("%f %f %f", normals[0].x, normals[1].y, normals[2].z);
 }
