@@ -241,15 +241,133 @@ bool doInput(const char* path) {
 			}
 			
 		} else if( buffer[0] == 'm' ) {
+			char lib[64];
 			int r = sscanf(buffer,
 				"mtllib %s", 
-				&mtlLib.path);
+				lib);
 			
 			if( r != 1 )
 				printf("Failed to read mtllib properly!\n");
+			else
+				readMtlLib(lib);
 			
 		}
 		
+	}
+	
+	fclose(f);
+	
+	return true;
+}
+
+bool readMtlLib(const char* path) {
+	FILE *f;
+	
+	f = fopen(path, "r");
+	
+	if( f == NULL ) {
+		printf("Failed to open file: %s\n", path);
+		return false;
+	}
+	
+	while( !feof(f) ) {
+		string buff;
+		int r;
+		
+		while( true ) {
+			r = fgetc(f);
+			
+			if( r == EOF || r == '\n' ) {
+				break;
+			}
+			
+			buff.push_back(r);
+		}
+		
+		const char* buffer = buff.c_str();
+		
+		if( buffer[0] == '#' || strlen(buffer) == 0 )
+			continue;
+		else if( buffer[0] == 'n' && buffer[1] == 'e' && buffer[2] == 'w' ) {
+			Material m;
+			
+			r = sscanf(buffer,
+				"newmtl %s",
+				&m.name);
+				
+			if( r != 1 ) {
+				printf("Failed to read material name properly!\n");
+				return false;
+			} else {
+				materials.push_back(m);
+			}
+		}
+		else if( buffer[0] == 'K' && buffer[1] == 'a' ) {
+			r = sscanf(buffer,
+				"Ka %f %f %f",
+				&materials[materials.size()-1].Ka[0],
+				&materials[materials.size()-1].Ka[1],
+				&materials[materials.size()-1].Ka[2]);
+				
+			if( r != 3 ) {
+				printf("Failed to read material's ambient color properly!\n");
+				return false;
+			}
+		}
+		else if( buffer[0] == 'K' && buffer[1] == 'd' ) {
+			r = sscanf(buffer,
+				"Kd %f %f %f",
+				&materials[materials.size()-1].Kd[0],
+				&materials[materials.size()-1].Kd[1],
+				&materials[materials.size()-1].Kd[2]);
+				
+			if( r != 3 ) {
+				printf("Failed to read material's diffuse color properly!\n");
+				return false;
+			}
+		}
+		else if( buffer[0] == 'K' && buffer[1] == 's' ) {
+			r = sscanf(buffer,
+				"Ks %f %f %f",
+				&materials[materials.size()-1].Ks[0],
+				&materials[materials.size()-1].Ks[1],
+				&materials[materials.size()-1].Ks[2]);
+				
+			if( r != 3 ) {
+				printf("Failed to read material's specular color properly!\n");
+				return false;
+			}
+		}
+		else if( buffer[0] == 'N' && buffer[1] == 's' ) {
+			r = sscanf(buffer,
+				"Ns %f",
+				&materials[materials.size()-1].Ns);
+				
+			if( r != 1 ) {
+				printf("Failed to read material's specular exponent properly!\n");
+				return false;
+			}
+		}
+		else if( buffer[0] == 'd' ) {
+			r = sscanf(buffer,
+				"d %f",
+				&materials[materials.size()-1].d);
+				
+			if( r != 1 ) {
+				printf("Failed to read material's dissolved properly!\n");
+				return false;
+			}
+		}
+		else if( buffer[0] == 'i' && buffer[1] == 'l' ) {
+			r = sscanf(buffer,
+				"illum %d",
+				&materials[materials.size()-1].illum);
+				
+			if( r != 1 ) {
+				printf("Failed to read material's illumination models properly!\n");
+				return false;
+			}
+		}
 	}
 	
 	fclose(f);
@@ -311,6 +429,15 @@ bool doOutput(const char* path) {
 	
 	for(uint i = 0; i < faces.size(); i++) {
 		if( !fW(f, &faces[i], sizeof(Face)) )
+			return false;
+	}
+	
+	size = materials.size();
+	if( !fW(f, &size, sizeof(uint)) )
+		return false;
+	
+	for(uint i = 0; i < materials.size(); i++) {
+		if( !fW(f, &materials[i], sizeof(Material)) )
 			return false;
 	}
 	
