@@ -7,11 +7,10 @@
 #include <vector>
 #include <string>
 
-#define HEADER "MODEL"
-
 using namespace std;
 
 typedef unsigned int uint;
+typedef unsigned short ushort;
 
 struct Vertex {
 	float x, y, z; // w
@@ -26,11 +25,11 @@ struct Normal {
 };
 
 struct Face {
+	bool quad;
+	
 	uint vertex[4];
 	uint texture[4];
 	uint normal[4];
-	
-	bool quad;
 };
 
 struct MtlLib {
@@ -38,6 +37,9 @@ struct MtlLib {
 	
 	int length() { return strlen(path); }
 };
+
+const char *HEADER = "MODEL";
+const ushort VERSION = 1;
 
 vector<Vertex> vertexes;
 vector<TextureCoordinate> textureCoordinates;
@@ -50,6 +52,7 @@ int main(int argc, char** args);
 
 bool doInput(const char* path);
 bool doOutput(const char* path);
+bool fW(FILE *f, const void * ptr, size_t size);
 
 void printInfo();
 

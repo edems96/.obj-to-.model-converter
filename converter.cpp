@@ -1,13 +1,35 @@
 #include "converter.h"
 
 int main(int argc, char** args) {
+	char *input, *output;
 	
-	if( doInput("nap.obj") ) {
-		printf("do Input ok\n");
-		printInfo();
+	for(uint i = 1; i < argc; i++) {
+		
+		switch( args[i][1] ) {
+			case 'i': 
+				input = (char*) malloc(strlen(args[++i]));	
+				memcpy(input, args[i], strlen(args[i]));
+				break;
+				
+			case 'o': 
+				output = (char*) malloc(strlen(args[++i]));	
+				memcpy(output, args[i], strlen(args[i])); break;
+		}
+		
 	}
-	else
-		printf("do Input not ok\n");
+	
+	printf("Input file: %s\n", input);
+	printf("Output file: %s\n", output);
+	
+	if( doInput(input) ) {
+		
+		if( doOutput(output) )
+			printf("Successfully wrote out!");
+		else
+			printf("Failed to write output!");
+		
+	} else
+		printf("Failed to read input!");
 	
 	return 1;
 }
@@ -38,8 +60,6 @@ bool doInput(const char* path) {
 		
 		const char* buffer = buff.c_str();
 		
-		//printf("buffer (%d): %s\n", buff.length(), buffer);
-		
 		if( buffer[0] == '#' )
 			continue;
 		else if( buffer[0] == 'v' && buffer[1] == ' ' ) {
@@ -53,8 +73,11 @@ bool doInput(const char* path) {
 				
 			if( r == 3 )
 				vertexes.push_back(v);
-			else
+			else {
 				printf("Failed to read vertex property!\n");
+				return false;
+			}
+			
 		}
 		else if( buffer[0] == 'v' && buffer[1] == 't' ) {
 			TextureCoordinate tc;
@@ -66,8 +89,11 @@ bool doInput(const char* path) {
 				
 			if( r == 2 )
 				textureCoordinates.push_back(tc);
-			else
+			else {
 				printf("Failed to read texture coordinate property!\n");
+				return false;
+			}
+			
 		}
 		else if( buffer[0] == 'v' && buffer[1] == 'n' ) {
 			Normal n;
@@ -80,8 +106,11 @@ bool doInput(const char* path) {
 				
 			if( r == 3 )
 				normals.push_back(n);
-			else
+			else {
 				printf("Failed to read normal property!\n");
+				return false;
+			}
+			
 		}
 		else if( buffer[0] == 'f' ) {
 			Face f;
@@ -206,8 +235,10 @@ bool doInput(const char* path) {
 				
 			if( r == 12 ) 
 				faces.push_back(f);
-			else
+			else {
 				printf("Failed to read face properly!\n");
+				return false;
+			}
 			
 		} else if( buffer[0] == 'm' ) {
 			int r = sscanf(buffer,
@@ -235,11 +266,61 @@ bool doOutput(const char* path) {
 		return false;
 	}
 	
-	fwrite(HEADER, strlen(HEADER), 1, f);
+	if( !fW(f, HEADER, strlen(HEADER)) )
+		return false;
+	
+	if( !fW(f, &VERSION, sizeof(ushort)) )
+		return false;
+	
+	uint size;
+
+	// VERTEX
+	size = vertexes.size();
+	if( !fW(f, &size, sizeof(uint)) )
+		return false;
+	
+	for(uint i = 0; i < vertexes.size(); i++) {
+		if( !fW(f, &vertexes[i], sizeof(Vertex)) )
+			return false;
+	}
+	
+	// TextureCoordinate
+	size = textureCoordinates.size();
+	if( !fW(f, &size, sizeof(uint)) )
+		return false;
+	
+	for(uint i = 0; i < textureCoordinates.size(); i++) {
+		if( !fW(f, &textureCoordinates[i], sizeof(TextureCoordinate)) )
+			return false;
+	}
+	
+	// Normal
+	size = normals.size();
+	if( !fW(f, &size, sizeof(uint)) )
+		return false;
+	
+	for(uint i = 0; i < normals.size(); i++) {
+		if( !fW(f, &normals[i], sizeof(Normal)) )
+			return false;
+	}
+	
+	// Face
+	size = faces.size();
+	if( !fW(f, &size, sizeof(uint)) )
+		return false;
+	
+	for(uint i = 0; i < faces.size(); i++) {
+		if( !fW(f, &faces[i], sizeof(Face)) )
+			return false;
+	}
 	
 	fclose(f);
 	
 	return true;
+}
+
+bool fW(FILE *f, const void * ptr, size_t size) {
+	return fwrite(ptr, size, 1, f) == 1;
 }
 
 void printInfo() {
@@ -248,6 +329,4 @@ void printInfo() {
 	printf("\tTextureCoordinate count: %d\n", textureCoordinates.size());
 	printf("\tNormal count: %d\n", normals.size());
 	printf("\tFace count: %d\n", faces.size());
-	
-	//printf("%f %f %f", normals[0].x, normals[1].y, normals[2].z);
 }
