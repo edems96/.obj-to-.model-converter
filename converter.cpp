@@ -227,6 +227,18 @@ bool doInput(const char* path) {
 }
 
 bool doOutput(const char* path) {
+	FILE *f;
+	f = fopen(path, "wb+");
+	
+	if( f == NULL ) {
+		printf("Failed to open file for write: %s\n", path);
+		return false;
+	}
+	
+	fwrite(HEADER, strlen(HEADER), 1, f);
+	
+	fclose(f);
+	
 	return true;
 }
 

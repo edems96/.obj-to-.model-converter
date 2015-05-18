@@ -7,6 +7,8 @@
 #include <vector>
 #include <string>
 
+#define HEADER "MODEL"
+
 using namespace std;
 
 typedef unsigned int uint;
