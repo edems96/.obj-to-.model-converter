@@ -43,4 +43,7 @@ Temporary Items
 .apdisk
 
 # models
-.model
+*.model
+
+# compilled files
+*.exe

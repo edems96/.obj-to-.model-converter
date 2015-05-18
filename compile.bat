@@ -1,2 +1,2 @@
-g++ converter.cpp -o converter.exe
+g++ src/converter.cpp -o converter.exe
 pause
