@@ -138,10 +138,77 @@ bool doInput(const char* path) {
 				&f.texture[2],
 				&f.normal[2]);
 				
-			if( r == 9 )
+			if( r == 9 ) {
+				faces.push_back(f);
+				continue;
+			}
+			
+			f.quad = true;
+			
+			r = sscanf(buffer,
+				"f %d %d %d %d",
+				&f.vertex[0],
+				&f.vertex[1],
+				&f.vertex[2],
+				&f.vertex[3]);
+				
+			if( r == 4 ) {
+				faces.push_back(f);
+				continue;
+			}
+			
+			r = sscanf(buffer,
+				"f %d/%d/ %d/%d/ %d/%d/ %d/%d/",
+				&f.vertex[0],
+				&f.texture[0],
+				&f.vertex[1],
+				&f.texture[1],
+				&f.vertex[2],
+				&f.texture[2],
+				&f.vertex[3],
+				&f.texture[3]);
+				
+			if( r == 8 ) {
+				faces.push_back(f);
+				continue;
+			}
+			
+			r = sscanf(buffer,
+				"f %d//%d %d//%d %d//%d %d//%d",
+				&f.vertex[0],
+				&f.normal[0],
+				&f.vertex[1],
+				&f.normal[1],
+				&f.vertex[2],
+				&f.normal[2],
+				&f.vertex[3],
+				&f.normal[3]);
+				
+			if( r == 8 ) {
+				faces.push_back(f);
+				continue;
+			}
+			
+			r = sscanf(buffer,
+				"f %d/%d/%d %d/%d/%d %d/%d/%d %d/%d/%d",
+				&f.vertex[0],
+				&f.texture[0],
+				&f.normal[0],
+				&f.vertex[1],
+				&f.texture[1],
+				&f.normal[1],
+				&f.vertex[2],
+				&f.texture[2],
+				&f.normal[2],
+				&f.vertex[3],
+				&f.texture[3],
+				&f.normal[3]);
+				
+			if( r == 12 ) 
 				faces.push_back(f);
 			else
 				printf("Failed to read face properly!\n");
+			
 		} else if( buffer[0] == 'm' ) {
 			int r = sscanf(buffer,
 				"mtllib %s", 
