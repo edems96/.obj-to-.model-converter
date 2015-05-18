@@ -51,7 +51,7 @@ bool doInput(const char* path) {
 				&v.y,
 				&v.z);
 				
-			if( r > 0 )
+			if( r == 3 )
 				vertexes.push_back(v);
 			else
 				printf("Failed to read vertex property!\n");
@@ -64,7 +64,7 @@ bool doInput(const char* path) {
 				&tc.u,
 				&tc.v);
 				
-			if( r > 0 )
+			if( r == 2 )
 				textureCoordinates.push_back(tc);
 			else
 				printf("Failed to read texture coordinate property!\n");
@@ -85,6 +85,7 @@ bool doInput(const char* path) {
 		}
 		else if( buffer[0] == 'f' ) {
 			Face f;
+			f.quad = false;
 			
 			r = sscanf(buffer,
 				"f %d %d %d",
@@ -92,21 +93,7 @@ bool doInput(const char* path) {
 				&f.vertex[1],
 				&f.vertex[2]);
 				
-			if( r > 0 ) {
-				faces.push_back(f);
-				continue;
-			}
-			
-			r = sscanf(buffer,
-				"f %d//%d %d//%d %d//%d",
-				&f.vertex[0],
-				&f.normal[0],
-				&f.vertex[1],
-				&f.normal[1],
-				&f.vertex[2],
-				&f.normal[2]);
-				
-			if( r > 0 ) {
+			if( r == 3 ) {
 				faces.push_back(f);
 				continue;
 			}
@@ -120,7 +107,21 @@ bool doInput(const char* path) {
 				&f.vertex[2],
 				&f.texture[2]);
 				
-			if( r > 0 ) {
+			if( r == 6 ) {
+				faces.push_back(f);
+				continue;
+			}
+			
+			r = sscanf(buffer,
+				"f %d//%d %d//%d %d//%d",
+				&f.vertex[0],
+				&f.normal[0],
+				&f.vertex[1],
+				&f.normal[1],
+				&f.vertex[2],
+				&f.normal[2]);
+				
+			if( r == 6 ) {
 				faces.push_back(f);
 				continue;
 			}
@@ -137,10 +138,18 @@ bool doInput(const char* path) {
 				&f.texture[2],
 				&f.normal[2]);
 				
-			if( r > 0 )
+			if( r == 9 )
 				faces.push_back(f);
 			else
 				printf("Failed to read face properly!\n");
+		} else if( buffer[0] == 'm' ) {
+			int r = sscanf(buffer,
+				"mtllib %s", 
+				&mtlLib.path);
+			
+			if( r != 1 )
+				printf("Failed to read mtllib properly!\n");
+			
 		}
 		
 	}

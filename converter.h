@@ -3,6 +3,7 @@
 
 #include <cstdio>
 #include <cstdlib>
+#include <cstring>
 #include <vector>
 #include <string>
 
@@ -23,17 +24,25 @@ struct Normal {
 };
 
 struct Face {
-	uint vertex[3];
-	uint texture[3];
-	uint normal[3];
+	uint vertex[4];
+	uint texture[4];
+	uint normal[4];
+	
+	bool quad;
 };
 
-char *mtlLib;
+struct MtlLib {
+	char path[64];
+	
+	int length() { return strlen(path); }
+};
 
 vector<Vertex> vertexes;
 vector<TextureCoordinate> textureCoordinates;
 vector<Normal> normals;
 vector<Face> faces;
+
+MtlLib mtlLib;
 
 int main(int argc, char** args);
 
