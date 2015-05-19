@@ -15,15 +15,17 @@ int main(int argc, char** args) {
 	printf("Input file: %s\n", input.c_str());
 	printf("Output file: %s\n", output.c_str());
 	
+	printf("\n");
+	
 	if( doInput(input.c_str()) ) {
 		
 		if( doOutput(output.c_str()) )
-			printf("Successfully wrote out!");
+			printf("Successfully write output!\n");
 		else
-			printf("Failed to write output!");
+			printf("Failed to write output!\n");
 		
 	} else
-		printf("Failed to read input!");
+		printf("Failed to read input!\n");
 	
 	return 1;
 }
@@ -411,6 +413,23 @@ bool readMtlLib(const char* path) {
 			if( r != 1 ) {
 				printf("Failed to read material's illumination models properly!\n");
 				return false;
+			}
+		}
+		else if( buffer[0] == 'm' && buffer[1] == 'a' && buffer[2] == 'p' ) {
+			char in[64];
+			
+			r = sscanf(buffer,
+				"map_Kd %s",
+				&in);
+				
+			if( r == 1 ) {
+				string map_Kd = in;
+				size_t pos = map_Kd.find_last_of("/\\");
+
+				if( pos == string::npos )
+					strcpy(materials[materials.size()-1].map_Kd, map_Kd.c_str());
+				else
+					strcpy(materials[materials.size()-1].map_Kd, map_Kd.substr(pos + 1).c_str());
 			}
 		}
 	}

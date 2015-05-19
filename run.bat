@@ -1,2 +1,2 @@
-converter.exe -i test1obj.obj -o test1.model
+converter.exe -i test2.obj -o test2.model
 pause
