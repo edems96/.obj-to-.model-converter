@@ -2,14 +2,41 @@
 
 int main(int argc, char** args) {
 	string input, output;
+	bool verbose = false;
 	
-	for(uint i = 1; i < argc; i++) {
-		
-		switch( args[i][1] ) {
-			case 'i': input = args[++i]; break;
-			case 'o': output = args[++i]; break;
+	if( argc == 1 ) {
+		printf("There's no arguments!\n");
+		return 0;
+	}
+	
+	if( argc == 2 ) 
+		input = args[1];
+	else {
+		for(uint i = 1; i < argc; i++) {
+			
+			switch( args[i][1] ) {
+				case 'i': input = args[++i]; break;
+				case 'o': output = args[++i]; break;
+				case 'v': verbose = true; break;
+			}
+			
 		}
+	}
+	
+	if( input.empty() ) {
+		printf("There's no input file!");
+		return 0;
+	}
+	
+	if( output.empty() ) {
+		size_t pos = input.find_last_of('.');
 		
+		if( pos == string::npos )
+			output = input;
+		else
+			output = input.substr(0, pos);
+
+		output += ".model";
 	}
 	
 	printf("Input file: %s\n", input.c_str());
@@ -18,6 +45,21 @@ int main(int argc, char** args) {
 	printf("\n");
 	
 	if( doInput(input.c_str()) ) {
+		
+		if( verbose ) {
+			printf("#Verbose#\n");
+			printf("\tVertex count: %d\n", vertexes.size());
+			printf("\tTexture coordinate count: %d\n", textureCoordinates.size());
+			printf("\tNormal count: %d\n", normals.size());
+			printf("\tFace count: %d\n", faces.size());
+			printf("\tMaterial count: %d\n", materials.size());
+			
+			for(uint i = 0; i < materials.size(); i++) {
+				if( materials[i].hasTexture )
+					printf("\t\t%s\n", materials[i].map_Kd);
+			}
+			printf("#Verbose#\n");
+		}
 		
 		if( doOutput(output.c_str()) )
 			printf("Successfully write output!\n");
@@ -277,7 +319,7 @@ bool doInput(const char* path) {
 				printf("Failed to read mtllib properly!\n");
 			else {
 				if( !readMtlLib(lib) ) {
-					printf("Failed to read mtl lib!\n");
+					printf("Failed to read MtlLib: %s\n", lib);
 					return false;
 				}
 			}
@@ -314,8 +356,6 @@ bool readMtlLib(const char* path) {
 		printf("Failed to open file: %s\n", path);
 		return false;
 	}
-	
-	printf("Reading %s mtllib file!\n", path);
 	
 	while( !feof(f) ) {
 		string buff;
@@ -430,6 +470,8 @@ bool readMtlLib(const char* path) {
 					strcpy(materials[materials.size()-1].map_Kd, map_Kd.c_str());
 				else
 					strcpy(materials[materials.size()-1].map_Kd, map_Kd.substr(pos + 1).c_str());
+				
+				materials[materials.size()-1].hasTexture = true;
 			}
 		}
 	}
